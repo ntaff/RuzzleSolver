@@ -1,12 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Éditeur de Spyder
-
-Ceci est un script temporaire.
-"""
-#œ = 339
-#é = 233
-#e = 101
 
 
 import unicodedata
