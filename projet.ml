@@ -1,12 +1,11 @@
-#open "hashtbl";;
 
 (********************** CHAINE **********************)
 
 let longChaine = fun s -> string_length s;;
 
 let sousChaine = fun (s, n, m) -> if m < n
-									then ""
-								else sub_string s (n - 1) (m - n + 1);;
+					then ""
+				  else sub_string s (n - 1) (m - n + 1);;
 
 let tetec = fun 
 "" -> failwith "tetec: chaine vide"
@@ -71,26 +70,25 @@ let rec suite = fun
 (_, "", _, _) -> true
 | (_, _, 16, _) -> false
 | (p, word, indice, last) -> if p.[indice] = tetec(word) & spaceNext(indice, last) = true
-								then if suite(removeLetter(p, indice), reste(word), 0, indice) = false
-										then suite(p, word, indice + 1, last)
-									else true
-							else suite(p, word, indice + 1, last);;
+					then if suite(removeLetter(p, indice), reste(word), 0, indice) = false
+						then suite(p, word, indice + 1, last)
+					else true
+				else suite(p, word, indice + 1, last);;
 
 
 let rec depart = fun
-(p, word, 16) -> false
+(_, _, 16) -> false
 | (p, word, indice) -> if p.[indice] = tetec(word)
-							then if suite(removeLetter(p, indice), reste(word), 0, indice) = false
-									then depart(p, word, indice + 1)
-								else true
-						else depart(p, word, indice + 1);;
+				then if suite(removeLetter(p, indice), reste(word), 0, indice) = false
+					then depart(p, word, indice + 1)
+				else true
+			else depart(p, word, indice + 1);;
 
 let rec start = fun
 (p, x :: l) -> if depart(p, x, 0) = true
-					then x :: start(p, l)
-				else start(p, l)
+			then x :: start(p, l)
+		else start(p, l)
 | _ -> [];;
-
 
 
 
@@ -103,3 +101,12 @@ let fileContent = readFileByLines(fd);;
 close_in fd;;
 
 let resultats = start("audnsbceaeblifil", fileContent);;
+
+(*
+trace "spaceNext";;
+trace "suite";;
+trace "depart";;
+trace "start";;
+
+let resultats = start("audnsbceaeblifil", ["abeille"]);;
+*)
