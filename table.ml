@@ -4,7 +4,7 @@
 #open "hashtbl";;
 
 
-(* recher à l'élément "elem" de la table et renvoit toutes ses valeurs sous forme de liste *)
+(* Recherche à l'élément "elem" de la table et renvoit toutes ses valeurs sous forme de liste *)
 let getFromTable = fun (table, elem) -> try
 						find_all table elem
 					with Not_found -> [];;
