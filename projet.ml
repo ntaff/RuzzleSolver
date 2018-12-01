@@ -63,14 +63,18 @@ let spaceNext = fun
 | (_, _) -> false;;
 
 
-let resetIndex = fun x -> 0;;
+let resetIndex = fun
+0 -> 0
+| i when (i mod 4 >= 1) & ((i - (i mod 4)) / 4 >= 1) -> i - 5
+| i when (i / 4) = 0 -> i - 1
+| i when (i mod 4) = 0 -> i - 4;;
 
 
 let rec suite = fun
 (_, "", _, _) -> true
 | (_, _, 16, _) -> false
 | (p, word, indice, last) -> if p.[indice] = tetec(word) & spaceNext(indice, last) = true
-					then if suite(removeLetter(p, indice), reste(word), 0, indice) = false
+					then if suite(removeLetter(p, indice), reste(word), resetIndex(indice), indice) = false
 						then suite(p, word, indice + 1, last)
 					else true
 				else suite(p, word, indice + 1, last);;
@@ -79,7 +83,7 @@ let rec suite = fun
 let rec depart = fun
 (_, _, 16) -> false
 | (p, word, indice) -> if p.[indice] = tetec(word)
-				then if suite(removeLetter(p, indice), reste(word), 0, indice) = false
+				then if suite(removeLetter(p, indice), reste(word), resetIndex(indice), indice) = false
 					then depart(p, word, indice + 1)
 				else true
 			else depart(p, word, indice + 1);;
