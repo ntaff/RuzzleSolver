@@ -16,7 +16,7 @@ let display = fun s v -> print_string("Key: " ^ s ^ " \tValue: " ^ v ^ "\n");;
 
 (*************************************************************)
 
-let table = new 1;; (* La veleur après le new n'a pas d'omportance *)
+let table = new 1;; (* La veleur après le new n'a pas d'importance *)
 
 add table "key1" "val1";;
 add table "key1" "val2";;
