@@ -1,11 +1,10 @@
 
+
 (********************** CHAINE **********************)
 
-let longChaine = fun s -> string_length s;;
-
 let sousChaine = fun (s, n, m) -> if m < n
-					then ""
-				  else sub_string s (n - 1) (m - n + 1);;
+									then ""
+								else sub_string s (n - 1) (m - n + 1);;
 
 let tetec = fun 
 "" -> failwith "tetec: chaine vide"
@@ -15,7 +14,7 @@ let tetes = fun s -> string_of_char(tetec(s));;
 
 let reste = fun 
 "" -> failwith "La chaine est vide"
-| s -> sousChaine(s, 2, longChaine(s));;
+| s -> sousChaine(s, 2, string_length s);;
 
 
 (****************** LECTURE FICHIER ******************)
@@ -28,23 +27,21 @@ let rec readFileByLines fd =
 		l :: readFileByLines(fd)
 	with _ -> [];;
 
-(* DEBUGAGE Affiche une liste de string *)
-(* string list -> unit *)
-let rec displayStringList = fun
-(x :: l) -> print_string(x ^ "\n"); displayStringList(l)
-|[] -> print_string "\n";;
-
 
 (****************************************************)
 
 
+(* Remplace la lettre à l'index "i" par un espace*)
+(* string * int -> string *)
 let rec removeLetter = fun
-(p, 0) -> " " ^ reste(p)
-| (p, index) -> tetes(p) ^ removeLetter(reste(p), index - 1);;
+(s, 0) -> " " ^ reste(s)
+| (s, i) -> tetes(s) ^ removeLetter(reste(s), i - 1);;
+
 
 
 let spaceNext = fun
-(0, last) -> mem last [0;4;5]
+(_, -1) -> true
+| (0, last) -> mem last [0;4;5]
 | (1, last) ->  mem last [0;2;4;5;6]
 | (2, last) ->  mem last [1;3;5;6;7]
 | (3, last) ->  mem last [2;6;7]
@@ -70,30 +67,21 @@ let resetIndex = fun
 | i when (i mod 4) = 0 -> i - 4;;
 
 
-let rec suite = fun
+let rec recherche = fun
 (_, "", _, _) -> true
 | (_, _, 16, _) -> false
-| (p, word, indice, last) -> if p.[indice] = tetec(word) & spaceNext(indice, last) = true
-					then if suite(removeLetter(p, indice), reste(word), resetIndex(indice), indice) = false
-						then suite(p, word, indice + 1, last)
-					else true
-				else suite(p, word, indice + 1, last);;
+| (p, word, indice, last) -> if p.[indice] = tetec(word) & spaceNext(indice, last)
+								then if recherche(removeLetter(p, indice), reste(word), resetIndex(indice), indice) = false
+										then recherche(p, word, indice + 1, last)
+									else true
+							else recherche(p, word, indice + 1, last);;
 
-
-let rec depart = fun
-(_, _, 16) -> false
-| (p, word, indice) -> if p.[indice] = tetec(word)
-				then if suite(removeLetter(p, indice), reste(word), resetIndex(indice), indice) = false
-					then depart(p, word, indice + 1)
-				else true
-			else depart(p, word, indice + 1);;
 
 let rec start = fun
-(p, x :: l) -> if depart(p, x, 0) = true
-			then x :: start(p, l)
-		else start(p, l)
+(p, x :: l) -> if recherche(p, x, 0, -1)
+					then x :: start(p, l)
+				else start(p, l)
 | _ -> [];;
-
 
 
 let file = "C:\Users\adrie\Desktop\Projet\dico.txt";;
