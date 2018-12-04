@@ -103,15 +103,20 @@ let rec start = fun
 
 (*********************** JEUX DE TESTS *********************************)
 
-let file = "C:\Users\adrie\Desktop\Projet\dico.txt";;
+let time = Sys__time();;
+
+let file = "C:\Users\Taffoureau\Documents\dico.txt";;
 
 let fd = open_in(file);;
 
 let fileContent = readFileByLines(fd);;
 
 close_in fd;;
+Sys__time() -. time;;
 
+let timebis = Sys__time();;
 let resultats = start("audnsbceaeblifil", fileContent);;
+Sys__time() -. timebis;;
 
 (* Exemple avec le mot abeille *)
 (*
