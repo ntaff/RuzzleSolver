@@ -2,7 +2,16 @@
 
 Implémentation d'un solveur du jeu [Ruzzle](https://fr.wikipedia.org/wiki/Ruzzle). 
 
-Contient les fichiers suivants :
+V1 : Projet fonctionnel, temps d'execution : 0.375sec pour un tableau de jeu quelconque.
+V2 : Projet fonctionnel, temps d'execution : 0.2sec pour un tableau de jeu quelconque.
+      - Changement de la liste contenant le dictionnaire en arbre de préfixe (accès plus rapide), trié à l'aide d'un tri fusion.
+V2.5 : En cours de développement, temps d'execution : XXXsec pour un tableau de jeu quelconque
+      - Réduction du temps de génération de l'arbre, qui est actuellement de 15sec dans la V2.
+V3 : A VENIR
+      - Ajout du système de score, et attribution de poids à chaque lettres
+
+
+Contient les fichiers suivants (V1) :
 
 1. `dico.txt`: Contient un ensemble de 21000 mots, triés.
 
@@ -11,7 +20,7 @@ Contient les fichiers suivants :
    - `singleWord(s)` Retourne false si le mot est un mot composé
    - `parseFile()` Parse le dictionnaire et le tri dans l'ordre alphabétique
    
-3. `projet.ml`: Contient les fonctions permettant, à partir un tableau de jeu, de renvoyer l'ensemble des mots possibles, à partir d'un dictionnaire de mots
+3. `projetV1.ml`: Contient les fonctions permettant, à partir un tableau de jeu, de renvoyer l'ensemble des mots possibles, à partir d'un dictionnaire de mots
    - `sousChaine(s, n, m)` Retourne la chaîne de caractères entre les indices n et m (encapsulation de substring)
    - `tetec(s)` Renvoie le premier caractère d'une chaîne sous forme d'un char
    - `tetes(s)` Renvoie le premier caractère d'une chaîne sous forme d'un string
@@ -21,7 +30,6 @@ Contient les fichiers suivants :
    - `resetIndex(i)` Fonction d'optimisation permettant de commencer la recherche à la première case possible, évite de re parcourir tout le tableau
    - `recherche(s, s1, i, j)` Fonction de recherche appelant les fonctions annexes et renvois si un mot est constructible à partir du tableau de jeu
    - `start(s, sl)` Renvois une liste de tous les mots possible avec un tableau de jeu donné
-
 
 
 About the authors                                                  {#about}
