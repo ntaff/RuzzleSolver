@@ -155,18 +155,23 @@ let rec start = fun
 
 (****************************************************)
 
-let file = "C:\Users\adrie\Desktop\Projet\dico.txt";;
+
+let file = "C:\Users\Taffoureau\Documents\dico.txt";;
 
 let fd = open_in(file);;
-
+let timetri = Sys__time();;
 let fileContent = tri_fusion(readFileByLines(fd));;
-
+Sys__time() -. timetri;;
 close_in fd;;
-
+let time = Sys__time();;
 let arbre = createTree(fileContent, [Noeud("", [])]);;
-
-let result = start("cotanuaeoresiphc", arbre);; (* 129 *)
-
-let time = Sys__time();
-
 Sys__time() -. time;;
+let timebis = Sys__time();;
+let result = start("cotanuaeoresiphc", arbre);; (* 129 *)
+Sys__time() -. timebis;;
+
+(* Temps d'execution
+
+Temps pour la fonction start : 0.20sec
+Temps pour construire l'arbre : 15.2 (en moyenne)
+Temps pour la fonction recherche : Trop petit pour être mesuré *)
