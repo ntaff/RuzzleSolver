@@ -3,11 +3,17 @@
 Implémentation d'un solveur du jeu [Ruzzle](https://fr.wikipedia.org/wiki/Ruzzle). 
 
 V1 : Projet fonctionnel, temps d'execution : 0.375sec pour un tableau de jeu quelconque.
+
 V2 : Projet fonctionnel, temps d'execution : 0.2sec pour un tableau de jeu quelconque.
+
       - Changement de la liste contenant le dictionnaire en arbre de préfixe (accès plus rapide), trié à l'aide d'un tri fusion.
+      
 V2.5 : En cours de développement, temps d'execution : XXXsec pour un tableau de jeu quelconque
+
       - Réduction du temps de génération de l'arbre, qui est actuellement de 15sec dans la V2.
+      
 V3 : A VENIR
+
       - Ajout du système de score, et attribution de poids à chaque lettres
 
 
