@@ -36,13 +36,16 @@ let rec displayStringList = fun
 
 (********************* TRI **************************)
 
+(* Compare la longueur de deux chaînes de caractères *)
+(* compare : string -> string -> bool = <fun> *)
 let compare s1 s2 = let len1 = (string_length s1) and len2 = (string_length s2) in
 						len1 < len2 or
 						(if len1 = len2
 							then s1 < s2
 						else false);;
 
-
+(* Divise une liste en deux listes *)
+(* division : 'a list -> 'a list * 'a list = <fun> *)
 let rec division lst =
     match lst with
     | a::b::l -> let (lst1,lst2) = division l in
@@ -50,7 +53,8 @@ let rec division lst =
     | a::l -> (lst, l)
     | _ -> ([], []);;
 
-
+(* Fusionne deux listes *)
+(* fusion : string list -> string list -> string list = <fun> *)
 let rec fusion lst1 lst2 =
     match (lst1, lst2) with
     | [],_ -> lst2
@@ -61,7 +65,8 @@ let rec fusion lst1 lst2 =
         else
             t2::(fusion lst1 q2);;
 
-
+(* Effectue le tri fusion d'une liste *)
+(* tri_fusion : string list -> string list = <fun> *)
 let rec tri_fusion lst =
     match lst with
     | a::b::l -> let (lst1, lst2) = division (a::b::l) in
