@@ -2,8 +2,8 @@
 (********************** CHAINE **********************)
 
 let sousChaine = fun (s, n, m) -> if m < n
-			then ""
-			else sub_string s (n - 1) (m - n + 1);;
+									then ""
+								else sub_string s (n - 1) (m - n + 1);;
 
 let tetec = fun 
 "" -> failwith "tetec: chaine vide"
@@ -30,22 +30,20 @@ let rec readFileByLines fd =
 (* DEBUGAGE Affiche une liste de string *)
 (* string list -> unit *)
 let rec displayStringList = fun
-(x :: l) -> print_string(x ^ "\n"); displayStringList(l)
+(x :: l) -> print_string(x ^ "\n");
+			displayStringList(l)
 |[] -> print_string "\n";;
 
 
 (********************* TRI **************************)
 
-(* Compare la longueur de deux chaînes de caractères *)
-(* compare : string -> string -> bool = <fun> *)
 let compare s1 s2 = let len1 = (string_length s1) and len2 = (string_length s2) in
 						len1 < len2 or
 						(if len1 = len2
 							then s1 < s2
 						else false);;
 
-(* Divise une liste en deux listes *)
-(* division : 'a list -> 'a list * 'a list = <fun> *)
+
 let rec division lst =
     match lst with
     | a::b::l -> let (lst1,lst2) = division l in
@@ -53,8 +51,7 @@ let rec division lst =
     | a::l -> (lst, l)
     | _ -> ([], []);;
 
-(* Fusionne deux listes *)
-(* fusion : string list -> string list -> string list = <fun> *)
+
 let rec fusion lst1 lst2 =
     match (lst1, lst2) with
     | [],_ -> lst2
@@ -65,8 +62,7 @@ let rec fusion lst1 lst2 =
         else
             t2::(fusion lst1 q2);;
 
-(* Effectue le tri fusion d'une liste *)
-(* tri_fusion : string list -> string list = <fun> *)
+
 let rec tri_fusion lst =
     match lst with
     | a::b::l -> let (lst1, lst2) = division (a::b::l) in
@@ -77,29 +73,34 @@ let rec tri_fusion lst =
 	
 (********************* ARBRE ************************)
 
-(* Un type Arbre est un Noeud de String ou une liste d'arbre *)
 type Arbre = Noeud of string * Arbre list;;
 
-(*let matchString = fun
-("", _) -> true
-| (s1, s2) -> s1 = (sub_string s2 0 (string_length s1));;*)
+(* DEBUG Affiche l'abre*)
+let rec tiret = fun
+(-1) -> ""
+| (0) -> " "
+| (n) -> "\t" ^ tiret(n-1);;
+let rec displayTree = fun
+| (Noeud(s, lst) :: suite, p) -> print_string(tiret(p) ^ s ^ "\n");
+								displayTree(lst, p + 1);
+								displayTree(suite, p)
+| ([], p) -> print_string("");;
 
-(* Renvoie true si deux chaînes de caractères sont égales *)
-(* matchString : string * string -> bool = <fun> *)
+
 let rec matchString = fun
 ("", _) -> true
-| (s1, s2) -> if s1.[0] = s2.[0] then matchString(reste(s1), reste(s2)) else false;;
+| (s1, s2) -> if s1.[0] = s2.[0]
+					then matchString(reste(s1), reste(s2))
+				else false;;
 
-(* Ajoute un mot à l'arbre *)
-(* addInTree : string * Arbre list -> Arbre list = <fun> *)
+
 let rec addInTree = fun
 (mot, Noeud(s, lst) :: suite) -> if matchString(s, mot)
-				then Noeud(s, addInTree(mot, lst)) :: suite
-				else Noeud(s, lst) :: addInTree(mot, suite)
-| (mot, arbre) -> Noeud(mot, []) :: arbre;;
+									then Noeud(s, addInTree(mot, lst)) :: suite
+								 else Noeud(s, lst) :: addInTree(mot, suite)
+| (mot, []) -> [Noeud(mot, [])];;
 
-(* Créer l'arbre contenant le dictionnaire *)
-(* createTree : string list * Arbre list -> Arbre list = <fun> *)
+
 let rec createTree = fun
 (mot :: reste, arbre) -> createTree(reste, addInTree(mot, arbre))
 | (_, arbre) -> arbre;;
@@ -113,10 +114,7 @@ let rec removeLetter = fun
 (s, 0) -> " " ^ reste(s)
 | (s, i) -> tetes(s) ^ removeLetter(reste(s), i - 1);;
 
-(* Renvoie true si le déplacement est possible
-   si la case fin est adjacente à la case avant, faut sinon
-   La fonction mem vérifie la condition si last est contenu dans la liste suivante*)
-(* spaceNext : int * int -> bool = <fun> *)
+
 let spaceNext = fun
 (_, -1) -> true
 | (0, last) -> mem last [0;4;5]
@@ -137,9 +135,7 @@ let spaceNext = fun
 | (15, last) ->  mem last [10;11;14]
 | (_, _) -> false;;
 
-(* Fonction d'optimisation permettant de commencer la recherche à la première case possible, évite de
-   re parcourir tout le tableau *)
-(* resetIndex : int -> int = <fun> *)
+
 let resetIndex = fun
 0 -> 0
 | i when (i mod 4 >= 1) & ((i - (i mod 4)) / 4 >= 1) -> i - 5
@@ -147,48 +143,43 @@ let resetIndex = fun
 | i when (i mod 4) = 0 -> i - 4
 | _ -> 0;;
 
-(* Fonction de recherche appelant les fonctions annexes et renvois si un mot est constructible à partir du tableau de jeu  *)
-(* recherche : string * string * int * int -> bool = <fun> *)
+
 let rec recherche = fun
 (_, "", _, _) -> true
 | (_, _, 16, _) -> false
 | (p, word, indice, last) -> if p.[indice] = tetec(word) & spaceNext(indice, last)
-			then if recherche(removeLetter(p, indice), reste(word), resetIndex(indice), indice) = false
-						then recherche(p, word, indice + 1, last)
-							else true
-				else recherche(p, word, indice + 1, last);;
+								then if recherche(removeLetter(p, indice), reste(word), resetIndex(indice), indice) = false
+										then recherche(p, word, indice + 1, last)
+									else true
+							else recherche(p, word, indice + 1, last);;
 
 
-(* Renvois une liste de tous les mots possible avec un tableau de jeu donné *)
-(* start : string * Arbre list -> string list = <fun> *)
+
 let rec start = fun
 (grille, Noeud(s, lst) :: suite) -> if recherche(grille, s, 0, -1)
-							then s :: start(grille, lst) @ start(grille, suite)
-							else start(grille, suite)
+											then s :: start(grille, lst) @ start(grille, suite)
+										else start(grille, suite)
 | (grille, []) -> [];;
 
 
+(****************************************************)
 
-
-(*********************** JEU DE TESTS *****************************)
-
-
-let file = "C:\Users\Taffoureau\Documents\dico.txt";;
+let file = "C:\Users\pedago\Desktop\Projet\dico.txt";;
 
 let fd = open_in(file);;
-let timetri = Sys__time();;
+
 let fileContent = tri_fusion(readFileByLines(fd));;
-Sys__time() -. timetri;;
+
 close_in fd;;
-let time = Sys__time();;
+
 let arbre = createTree(fileContent, [Noeud("", [])]);;
+
+(* displayTree(arbre, -1);; *)
+
+let time = Sys__time();;
+
+let result = start("cotanuaeoresiphc", arbre);; (* 129 mots *)
+
 Sys__time() -. time;;
-let timebis = Sys__time();;
-let result = start("cotanuaeoresiphc", arbre);; (* 129 *)
-Sys__time() -. timebis;;
 
-(* Temps d'execution
-
-Temps pour la fonction start : 0.20sec
-Temps pour construire l'arbre : 15.2 (en moyenne)
-Temps pour la fonction recherche : Trop petit pour être mesuré *)
+string_of_int(list_length result) ^ " résultats trouvés";;
