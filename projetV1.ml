@@ -118,6 +118,13 @@ let timebis = Sys__time();;
 let resultats = start("audnsbceaeblifil", fileContent);;
 Sys__time() -. timebis;;
 
+
+(* Temps d'execution
+
+Temps pour la fonction start : 0.375sec
+Temps pour lire le dictionnaire : 0.040sec
+Temps pour la fonction recherche : Trop petit pour être mesuré *)
+
 (* Exemple avec le mot abeille *)
 (*
 trace "spaceNext";;
