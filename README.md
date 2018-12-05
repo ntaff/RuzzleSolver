@@ -3,13 +3,13 @@
 Implémentation d'un solveur du jeu [Ruzzle](https://fr.wikipedia.org/wiki/Ruzzle). 
 
 V1 : Projet fonctionnel.
-`Execution : 0.375sec pour un tableau de jeu quelconque.(Construction du dictionnaire : 0.045 sec)`
+`Execution : 0.375sec pour trouver les résultats.(Construction du dictionnaire : 0.045 sec)`
 
 V2 : Projet fonctionnel.
-`Execution : 0.18sec pour un tableau de jeu quelconque. (Construction de l'arbre : 15sec)`
+`Execution : 0.18sec pour trouver les résultats. (Construction de l'arbre : 15sec)`
       
 V3 : En cours de développement. 
-`Execution : XXXsec pour un tableau de jeu quelconque (Construction de l'arbre : XXXsec)`
+`Execution : XXXsec pour trouver les résultats. (Construction de l'arbre : XXXsec)`
 
 V4 : A VENIR
 
