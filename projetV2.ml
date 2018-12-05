@@ -1,16 +1,26 @@
+(****************************************************)
+(***************PROJET RUZZLE SOLVER*****************)
+(************NICOLAS TAFFOUREAU (@ntaff)*************)
+(************ADRIEN TREILHOU (@AdrienFAC)************)
+(*******************VERSION 2************************)
+(****************************************************)
 
 (********************** CHAINE **********************)
 
-let sousChaine = fun (s, n, m) -> if m < n
-									then ""
-								else sub_string s (n - 1) (m - n + 1);;
+(* sousChaine : string * int * int -> string = <fun> *)
+let sousChaine = fun (s, n, m)
+-> if m < n then "" else sub_string s (n - 1) (m - n + 1);;
 
+(* tetec : string -> char = <fun> *)
 let tetec = fun 
 "" -> failwith "tetec: chaine vide"
 | s -> nth_char s 0;;
 
-let tetes = fun s -> string_of_char(tetec(s));;
+(* tetes : string -> string = <fun> *)
+let tetes = fun s
+-> string_of_char(tetec(s));;
 
+(* reste : string -> string = <fun> *)
 let reste = fun 
 "" -> failwith "La chaine est vide"
 | s -> sousChaine(s, 2, string_length s);;
@@ -19,7 +29,7 @@ let reste = fun
 (****************** LECTURE FICHIER ******************)
 
 (* Lit un fichier ligne par ligne à partir de son fd et le renvois sous forme de le liste*)
-(* in_channel -> string list *)
+(* readFileByLines : in_channel -> string list = <fun> *)
 let rec readFileByLines fd =
 	try
 		let l = input_line fd in
@@ -37,6 +47,8 @@ let rec displayStringList = fun
 
 (********************* TRI **************************)
 
+(* Compare la longueur de deux chaînes de caractères *)
+(* compare : string -> string -> bool = <fun> *)
 let compare s1 s2 = let len1 = (string_length s1) and len2 = (string_length s2) in
 						len1 < len2 or
 						(if len1 = len2
@@ -44,6 +56,8 @@ let compare s1 s2 = let len1 = (string_length s1) and len2 = (string_length s2) 
 						else false);;
 
 
+(* Divise une liste en deux listes *)
+(* division : 'a list -> 'a list * 'a list = <fun> *)
 let rec division lst =
     match lst with
     | a::b::l -> let (lst1,lst2) = division l in
@@ -52,6 +66,8 @@ let rec division lst =
     | _ -> ([], []);;
 
 
+(* Fusionne deux listes *)
+(* fusion : string list -> string list -> string list = <fun> *)
 let rec fusion lst1 lst2 =
     match (lst1, lst2) with
     | [],_ -> lst2
@@ -63,6 +79,8 @@ let rec fusion lst1 lst2 =
             t2::(fusion lst1 q2);;
 
 
+(* Effectue le tri fusion d'une liste *)
+(* tri_fusion : string list -> string list = <fun> *)
 let rec tri_fusion lst =
     match lst with
     | a::b::l -> let (lst1, lst2) = division (a::b::l) in
@@ -73,6 +91,7 @@ let rec tri_fusion lst =
 	
 (********************* ARBRE ************************)
 
+(* Un type Arbre est un Noeud de String ou une liste d'arbre *)
 type Arbre = Noeud of string * Arbre list;;
 
 (* DEBUG Affiche l'abre*)
@@ -87,13 +106,17 @@ let rec displayTree = fun
 | ([], p) -> print_string("");;
 
 
+(* Renvoie true si deux chaînes de caractères sont égales *)
+(* matchString : string * string -> bool = <fun> *)
 let rec matchString = fun
 ("", _) -> true
 | (s1, s2) -> if s1.[0] = s2.[0]
 					then matchString(reste(s1), reste(s2))
 				else false;;
 
-
+				
+(* Ajoute un mot à l'arbre *)
+(* addInTree : string * Arbre list -> Arbre list = <fun> *)
 let rec addInTree = fun
 (mot, Noeud(s, lst) :: suite) -> if matchString(s, mot)
 									then Noeud(s, addInTree(mot, lst)) :: suite
@@ -101,6 +124,8 @@ let rec addInTree = fun
 | (mot, []) -> [Noeud(mot, [])];;
 
 
+(* Créer l'arbre contenant le dictionnaire *)
+(* createTree : string list * Arbre list -> Arbre list = <fun> *)
 let rec createTree = fun
 (mot :: reste, arbre) -> createTree(reste, addInTree(mot, arbre))
 | (_, arbre) -> arbre;;
@@ -115,6 +140,10 @@ let rec removeLetter = fun
 | (s, i) -> tetes(s) ^ removeLetter(reste(s), i - 1);;
 
 
+
+(* spaceNext(avant, fin) ---> true si le déplacement est possible, false sinon
+   La fonction mem vérifie la condition si last est contenu dans la liste suivante *)
+(* spaceNext : int * int -> bool = <fun> *)
 let spaceNext = fun
 (_, -1) -> true
 | (0, last) -> mem last [0;4;5]
@@ -136,6 +165,9 @@ let spaceNext = fun
 | (_, _) -> false;;
 
 
+(* Fonction d'optimisation permettant de commencer la recherche à la première case possible, évite de
+   re parcourir tout le tableau *)
+(* resetIndex : int -> int = <fun> *)
 let resetIndex = fun
 0 -> 0
 | i when (i mod 4 >= 1) & ((i - (i mod 4)) / 4 >= 1) -> i - 5
@@ -144,6 +176,8 @@ let resetIndex = fun
 | _ -> 0;;
 
 
+(* Fonction de recherche appelant les fonctions annexes et renvois si un mot est constructible à partir du tableau de jeu  *)
+(* recherche : string * string * int * int -> bool = <fun> *)
 let rec recherche = fun
 (_, "", _, _) -> true
 | (_, _, 16, _) -> false
@@ -154,32 +188,46 @@ let rec recherche = fun
 							else recherche(p, word, indice + 1, last);;
 
 
-
+(* Renvois une liste de tous les mots possible avec un tableau de jeu donné *)
+(* start : string * Arbre list -> string list = <fun> *)
 let rec start = fun
 (grille, Noeud(s, lst) :: suite) -> if recherche(grille, s, 0, -1)
-											then s :: start(grille, lst) @ start(grille, suite)
-										else start(grille, suite)
+										then s :: start(grille, lst) @ start(grille, suite)
+									else start(grille, suite)
 | (grille, []) -> [];;
 
 
 (****************************************************)
 
-let file = "C:\Users\pedago\Desktop\Projet\dico.txt";;
+(* Chemin d'accès absolu vers le dictionnaire *)
+let file = "C:\Users\Taffoureau\Documents\dico.txt";;  
 
-let fd = open_in(file);;
+(* On ouvre le fichier dans un fd *)
+let fd = open_in(file);; 
 
-let fileContent = tri_fusion(readFileByLines(fd));;
+(* On tri le dictionnaire par taille de mots puis par ordre alphabétique à l'aide d'un tri Fusion *)
+let fileContent = tri_fusion(readFileByLines(fd));; 
 
+(* On ferme le fd *)
 close_in fd;;
 
+(* On crée l'arbre associé au dictionnaire *)
 let arbre = createTree(fileContent, [Noeud("", [])]);;
 
+(* DEBUG *)
 (* displayTree(arbre, -1);; *)
 
+(* On prend l'empreinte de temps courante *)
 let time = Sys__time();;
 
-let result = start("cotanuaeoresiphc", arbre);; (* 129 mots *)
+(* On définie un tableau de jeu comme étant une chaîne de caractères *)
+let tableaudejeu = "ditamjnaeazgesifpc";;
 
-Sys__time() -. time;;
+(* On lance la recherche des solution à partir du tableau de jeu donné *)
+let result = start(tableaudejeu, arbre);; (* 129 mots *)
 
-string_of_int(list_length result) ^ " résultats trouvés";;
+(* Combien de temps a pris la recherche *)
+let timefinal = Sys__time() -. time;;
+
+(* On affiche le nombre de résultats et le temps mis pour les trouver *)
+string_of_int(list_length result) ^ " résultats trouvés en : " ^ string_of_float(timefinal) ^ " secondes.";;
