@@ -5,6 +5,7 @@
 (*******************VERSION 2************************)
 (****************************************************)
 
+
 (********************** CHAINE **********************)
 
 (* sousChaine : string * int * int -> string = <fun> *)
@@ -197,7 +198,7 @@ let rec start = fun
 | (grille, []) -> [];;
 
 
-(****************************************************)
+(*********************** JEU DE TESTS *********************************)
 
 (* Chemin d'accès absolu vers le dictionnaire *)
 let file = "C:\Users\Taffoureau\Documents\dico.txt";;  
@@ -221,13 +222,13 @@ let arbre = createTree(fileContent, [Noeud("", [])]);;
 let time = Sys__time();;
 
 (* On définie un tableau de jeu comme étant une chaîne de caractères *)
-let tableaudejeu = "ditamjnaeazgesifpc";;
+let tableaudejeu = "ditamjnaeazgesif";;
 
 (* On lance la recherche des solution à partir du tableau de jeu donné *)
-let result = start(tableaudejeu, arbre);; (* 129 mots *)
+let result = start(tableaudejeu, arbre);; (* 50 mots *)
 
 (* Combien de temps a pris la recherche *)
 let timefinal = Sys__time() -. time;;
 
 (* On affiche le nombre de résultats et le temps mis pour les trouver *)
-string_of_int(list_length result) ^ " résultats trouvés en : " ^ string_of_float(timefinal) ^ " secondes.";;
+"Pour le tableau de jeu : " ^ tableaudejeu ^ " on trouve " ^ string_of_int(list_length result) ^ " résultats en : " ^ string_of_float(timefinal) ^ " secondes.";;
