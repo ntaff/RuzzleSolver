@@ -1,3 +1,10 @@
+(****************************************************)
+(***************PROJET RUZZLE SOLVER*****************)
+(************NICOLAS TAFFOUREAU (@ntaff)*************)
+(************ADRIEN TREILHOU (@AdrienFAC)************)
+(*******************VERSION 3************************)
+(****************************************************)
+
 
 (********************** CHAINE **********************)
 
@@ -27,9 +34,10 @@ let rec displayStringList = fun
 	
 (********************* ARBRE ************************)
 
+(* On crée un arbre contenant des Noeuds de couples de char et bool ou des listes d'arbres  *)
 type Arbre = Noeud of (char * bool) * Arbre list;;
 
-
+(* On ajoute les noeuds à l'arbre *)
 let rec addInTree = fun
 ("", arbre) -> arbre
 | (mot, []) -> [Noeud((mot.[0], (string_length mot) = 1), addInTree(reste(mot), []))]
@@ -38,14 +46,15 @@ let rec addInTree = fun
 										else Noeud((c, b), lst) :: addInTree(mot, suite);;
 
 
+(* On crée l'arbre à partir du dictionnaire *)
 let rec createTree = fun
 (mot :: reste, arbre) -> createTree(reste, addInTree(mot, arbre))
 | (_, arbre) -> arbre;;
 
 
-(****************************************************)
+(*********************** JEU DE TESTS *****************************)
 
-let file = "E:\FAC\Caml\Projet\dico.txt";;
+let file = "C:\Users\Taffoureau\Documents\dico.txt";;
 
 let fd = open_in(file);;
 
@@ -57,4 +66,4 @@ let time = Sys__time();;
 
 let arbre = createTree(fileContent, [Noeud((` `, false), [])]);;
 
-Sys__time -. time;;
+Sys__time() -. time;; (* 0.25sec *)
