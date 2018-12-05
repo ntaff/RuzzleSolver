@@ -12,7 +12,7 @@ V4 : A VENIR
 
 Contient les fichiers suivants (V1) :
 
-1. `dico.txt`: Contient un ensemble de 21000 mots, triés.
+1. `dico.txt`: Contient un ensemble de 21538 mots, triés par ordre alphabétique.
 
 2. `parser.py`: Contient des fonctions permettant de parser un fichier texte afin d'enlever les caractères indésirables (accents, mots composés...)
    - `transform(s)` Enlève les accents, les cedilles etc...
