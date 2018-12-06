@@ -8,8 +8,8 @@ V1 : Projet fonctionnel.
 V2 : Projet fonctionnel.
 `Execution : 0.18sec pour trouver les résultats. (Construction de l'arbre : 15sec)`
       
-V3 : En cours de développement. 
-`Execution : XXXsec pour trouver les résultats. (Construction de l'arbre : XXXsec)`
+V3 : Projet fonctionnel. 
+`Execution : 0.03sec pour trouver les résultats. (Construction de l'arbre : 0.25sec)`
 
 V4 : A VENIR
 
