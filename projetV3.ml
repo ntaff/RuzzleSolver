@@ -163,3 +163,5 @@ print_string("Lecture du fichier: " ^ string_of_float(timeRead));;
 print_string("Creation de l'arbre: " ^ string_of_float(timeTree));;
 print_string("Recherche des résultats: " ^ string_of_float(timeResult));;
 print_string("Nombre de résultats: " ^ string_of_int(list_length result));;
+print_string("Liste des résultats:");;
+displayStringList(result);;
