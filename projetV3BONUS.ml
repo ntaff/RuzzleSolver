@@ -1,5 +1,6 @@
-
+(****************************************************)
 (***************** VARIABLES BONUS ******************)
+(****************************************************)
 
 let DL = 1;;
 let TL = 2;;
@@ -7,7 +8,9 @@ let DW = 3;;
 let TW = 4;;
 
 
+(****************************************************)
 (********************** CHAINE **********************)
+(****************************************************)
 
 let tetec = fun 
 "" -> failwith "tetec: chaine vide"
@@ -23,7 +26,9 @@ let reste = fun
 
 
 
+(****************************************************)
 (**************** LECTURE DU FICHIER ****************)
+(****************************************************)
 
 (* Lit un fichier ligne par ligne à partir de son file descriptor
 et le renvois sous forme de le liste de string *)
@@ -35,7 +40,9 @@ let rec readFileByLines fd =
 
 
 
+(****************************************************)
 (********************** ARBRE ***********************)
+(****************************************************)
 
 type Arbre = Noeud of (char * bool) * Arbre list;;
 
@@ -58,8 +65,10 @@ let createTree = fun
 
 
 
+(****************************************************)
 (********************* DEBUGAGE *********************)
 (*  /!\ Fonctions à supprimer avant de rendre /!\   *)
+(****************************************************)
 
 let rec setString = fun s -> let rec aux = fun
 							(s, 0) -> s
@@ -95,14 +104,17 @@ let rec displayTree = fun
 
 
 
+(****************************************************)
 (****************** FONCTIONS BONUS *****************)
+(****************************************************)
 
-
+(* Divise la grille en une string et 2 lites *)
 let rec divideInformations = fun
 ((a, b, c) :: l, (d, e, f)) -> divideInformations(l, (d ^ a, e @ [b], f @ [c]))
 | ([], triplet) -> triplet;;
 
 
+(* Renvois la taille du mot *)
 let rec numberLetter = fun
 "" -> 0
 | s -> if s.[0] = `.`
@@ -110,12 +122,14 @@ let rec numberLetter = fun
 		else numberLetter(reste(s));;
 
 
+(* Applique un bonus en fonction de la longueur du mot *)
 let lengthBonus = fun len -> if len > 4
 								then (len - 4) * 5
 							else 0;;
 
 
-
+(* Comptabilise le nombre de point en appliquant
+   les bonus de lettre compte double/triple *)
 let rec calculPoints = fun							
 (s, px::pl, bx::bl) -> if s.[0] = `.`
 								then calculPoints(reste(s), pl, bl) + (if bx = DL then px*2 else (if bx = TL then px*3 else px))
@@ -123,6 +137,7 @@ let rec calculPoints = fun
 | (_, _, _) -> 0;;
 
 
+(* Applique les bonus de mot compte double/triple *)
 let rec wordMult = fun
 (s, 3::l, points, total) when s.[0] = `.` -> wordMult(reste(s), l, points, total + 2)
 | (s, 4::l, points, total) when s.[0] = `.` -> wordMult(reste(s), l, points, total + 3)
@@ -130,10 +145,21 @@ let rec wordMult = fun
 | (_, _, points, total) -> if total = 0 then points else points * total;;
 
 
+(* Renvois le score d'un mot *)
 let score = fun (s, p, b) -> wordMult(s, b, calculPoints(s, p, b), 0) + lengthBonus(numberLetter(s));;
 
-(*********************** ALGO ***********************)
 
+(* Renvois le cumul de tous les points *)
+let rec getFinalScore = fun lst -> let rec aux = fun
+									([], lst, score) -> (lst, score)
+									| ((mot, points) :: l, lst, score) -> aux(l, mot :: lst, score + points)
+									in aux(lst, [], 0);;
+
+
+
+(****************************************************)
+(*********************** ALGO ***********************)
+(****************************************************)
 
 let rec insere = fun
 ((mot, point), (xmot, xpoint) :: l) -> if mot < xmot
@@ -146,6 +172,7 @@ let rec insere = fun
 | ((mot, point), []) -> [(mot, point)];;
 
 
+(* Retire les mots en double en gardant ceux qui rapportent le plus de points *)
 let removeDuplicate = fun ((mot, point) :: l) -> let rec aux = fun
 												((mot, point) :: l, lst) -> aux(l, insere((mot, point), lst))
 												| ([], lst) -> lst
@@ -217,38 +244,33 @@ let rec start = fun
 										in (search [i] g arbre "");;
 
 
-let rec getFinalScore = fun lst -> let rec aux = fun
-									([], lst, score) -> (lst, score)
-									| ((mot, points) :: l, lst, score) -> aux(l, mot :: lst, score + points)
-									in aux(lst, [], 0);;
-										
 let rec solve grille arbre = let (g, p, b) = divideInformations(grille, ("", [], [])) in
 											getFinalScore(removeDuplicate(start(0, g, arbre, p, b)));;
 
 
 
+(****************************************************)
 (*********************** TESTS **********************)
+(****************************************************)
 
 let file = "E:\FAC\Caml\Projet\dico.txt";;
 
-
-let grille =   [("d", 1, 0);
-				("i", 1, 0);
-				("t", 1, DL);
-				("a", 1, 0);
-				("m", 1, DW);
-				("j", 1, 0);
-				("n", 1, 0);
-				("a", 1, 0);
-				("e", 1, TW);
-				("a", 1, 0);
-				("z", 1, 0);
-				("g", 1, 0);
-				("e", 1, 0);
-				("s", 1, TL);
-				("i", 1, 0);
-				("f", 1, 0)];;
-
+let grille=[("d", 1, 0);
+			("i", 1, 0);
+			("t", 2, DL);
+			("a", 1, 0);
+			("m", 1, DW);
+			("j", 1, 0);
+			("n", 3, 0);
+			("a", 1, 0);
+			("e", 1, TW);
+			("a", 1, 0);
+			("z", 2, 0);
+			("g", 1, 0);
+			("e", 1, 0);
+			("s", 1, TL);
+			("i", 1, 0);
+			("f", 2, 0)];;
 
 let fd = open_in(file);;
 let timeRead = Sys__time();;
@@ -263,8 +285,6 @@ let timeTree = Sys__time() -. timeTree;;
 let timeResult = Sys__time();;
 let (result, points) = solve grille arbre;;
 let timeResult = Sys__time() -. timeResult;;
-
-
 
 print_string("\n\nLecture du fichier: " ^ string_of_float(timeRead));;
 print_string("Creation de l'arbre: " ^ string_of_float(timeTree));;
