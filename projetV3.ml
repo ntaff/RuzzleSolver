@@ -1,15 +1,25 @@
+(****************************************************)
+(***************PROJET RUZZLE SOLVER*****************)
+(************NICOLAS TAFFOUREAU (@ntaff)*************)
+(************ADRIEN TREILHOU (@AdrienFAC)************)
+(*******************VERSION 3************************)
+(****************************************************)
+
 
 
 (********************** CHAINE **********************)
 
+(* tetec : string -> char = <fun> *)
 let tetec = fun 
 "" -> failwith "tetec: chaine vide"
 | s -> nth_char s 0;;
 
 
+(* tetes : string -> string = <fun> *)
 let tetes = fun s -> string_of_char(tetec(s));;
 
 
+(* reste : string -> string = <fun> *)
 let reste = fun
 "" -> ""
 | s -> sub_string s (1) ((string_length s) - 1);;
@@ -20,6 +30,7 @@ let reste = fun
 
 (* Lit un fichier ligne par ligne à partir de son file descriptor
 et le renvois sous forme de le liste de string *)
+(* readFileByLines : in_channel -> string list = <fun> *)
 let rec readFileByLines fd =
 	try
 		let l = input_line fd in
@@ -34,6 +45,7 @@ type Arbre = Noeud of (char * bool) * Arbre list;;
 
 
 (* Ajoute un mot dans un arbre *)
+(* addInTree : string * Arbre list -> Arbre list = <fun> *)
 let rec addInTree = fun
 ("", arbre) -> arbre
 | (mot, []) -> [Noeud((mot.[0], (string_length mot) = 1), addInTree(reste(mot), []))]
@@ -43,6 +55,7 @@ let rec addInTree = fun
 
 
 (* Créé un arbre à partir d'une liste de mot *)
+(* createTree : string list * Arbre -> Arbre list = <fun> *)
 let createTree = fun
 (dico, Noeud((c, b), lst)) -> let rec aux = fun
 								(mot :: reste, arbre) -> aux(reste, addInTree(mot, arbre))
@@ -54,12 +67,16 @@ let createTree = fun
 (********************* DEBUGAGE *********************)
 (*  /!\ Fonctions à supprimer avant de rendre /!\   *)
 
+
+(* setString : string -> string = <fun> *)
 let rec setString = fun s -> let rec aux = fun
 							(s, 0) -> s
 							| (s, n) -> aux(s, n-1) ^ " "
 							in aux(s, 16 - (string_length s));;
 
-	
+							
+(* DEBUGAGE Affiche une liste de string *)
+(* displayStringList : string list -> unit = <fun> *)
 let rec displayStringList = fun
 |(a :: b :: c :: d :: e :: l) -> print_string(setString(a) ^ " " ^ setString(b) ^ " " ^ setString(c) ^ " " ^ setString(d) ^ " " ^ setString(e) ^ "\n");
 						displayStringList(l)
@@ -74,12 +91,14 @@ let rec displayStringList = fun
 |[] -> print_string "\n";;
 
 
+(* space : int -> string = <fun> *)
 let rec space = fun
 (-1) -> ""
 | (0) -> " "
 | (n) -> " " ^ space(n-1);;
 
 
+(* displayTree : Arbre list * int -> unit = <fun> *)
 let rec displayTree = fun
 (Noeud((c, b), lst) :: suite, p) -> print_string(space(p) ^ string_of_char(c) ^ "\n");
 									displayTree(lst, p+1);
@@ -91,6 +110,7 @@ let rec displayTree = fun
 (*********************** ALGO ***********************)
 
 (* Retire tous les doublon dans une liste *)
+(* removeDuplicate : 'a list -> 'a list = <fun> *)
 let removeDuplicate = fun
 (x :: l) -> let rec aux = fun
 			(a :: b, lst) -> if (mem a lst) then aux(b, lst) else aux(b, a::lst)
@@ -100,6 +120,7 @@ let removeDuplicate = fun
 
 
 (* Remplace la lettre à l'index (i) par un (".") *)
+(* removeLetter : string * int -> string = <fun> *)
 let rec removeLetter = fun
 (s, 0) -> "." ^ reste(s)
 | (s, i) -> tetes(s) ^ removeLetter(reste(s), i - 1);;
@@ -108,6 +129,8 @@ let rec removeLetter = fun
 (* Recherche dans un arbre une lettre.
    Raise Not_Found si la lettre n'est pas dans l'arbre *)
 exception Not_Found;;
+
+(* getBranche : char * Arbre list -> Arbre = <fun> *)
 let rec getBranche = fun
 (lettre, Noeud((c, b), lst) :: suite) -> if lettre = c
 											then (Noeud((c, b), lst))
@@ -117,6 +140,7 @@ let rec getBranche = fun
 
 (* Gère les déplacements dans la grille
    Renvois la liste des déplacements possibles *)
+(* canDo : int list * string -> int list = <fun> *)
 let rec canDo = fun
 (x :: l, g) -> if g.[x] != `.`
 					then x :: canDo(l, g)
@@ -126,6 +150,7 @@ let rec canDo = fun
 
 (* Gère les déplacements dans la grille
    Renvois la liste des déplacements possibles *)
+(* deplacement : int * string -> int list = <fun> *)
 let deplacement = fun
 (0, g) -> canDo([1;4;5], g)
 | (1, g) -> canDo([0;2;4;5;6], g)
@@ -148,6 +173,7 @@ let deplacement = fun
 
 (* Coeur de l'algorithme
    Renvois tous les mots contenus dans la grille de jeu *)
+(* start : int * string * Arbre list -> string list = <fun> *)
 let rec start = fun
 (16, g, arbre) -> []
 | (i, g, arbre) -> start(i+1, g, arbre) @ let rec search (x::l) g arbre mot =
@@ -163,14 +189,15 @@ let rec start = fun
 											with Not_Found -> if l = [] then [] else search l g arbre mot
 										in (search [i] g arbre "");;
 
-										
+
+(* solve : string -> Arbre list -> string list = <fun> *)
 let rec solve g arbre = removeDuplicate(start(0, g, arbre));;
 
 
 
-(*********************** TESTS **********************)
+(*********************** JEU DE TESTS **********************)
 
-let file = "E:\FAC\Caml\Projet\dico.txt";;
+let file = "C:\Users\Taffoureau\Documents\dico.txt";;
 let grille = "ditamjnaeazgesif";;
 
 let fd = open_in(file);;
