@@ -2,10 +2,10 @@
 (***************** VARIABLES BONUS ******************)
 (****************************************************)
 
-let DL = 1;;
-let TL = 2;;
-let DW = 3;;
-let TW = 4;;
+let DL = 1;; (* Lettre conte double *)
+let TL = 2;; (* Lettre conte triple *)
+let DW = 3;; (* Mot conte double *)
+let TW = 4;; (* Mot conte triple *)
 
 
 (****************************************************)
@@ -16,9 +16,7 @@ let tetec = fun
 "" -> failwith "tetec: chaine vide"
 | s -> nth_char s 0;;
 
-
 let tetes = fun s -> string_of_char(tetec(s));;
-
 
 let reste = fun
 "" -> ""
@@ -77,17 +75,12 @@ let rec setString = fun s -> let rec aux = fun
 
 	
 let rec displayStringList = fun
-|(a :: b :: c :: d :: e :: l) -> print_string(setString(a) ^ " " ^ setString(b) ^ " " ^ setString(c) ^ " " ^ setString(d) ^ " " ^ setString(e) ^ "\n");
-						displayStringList(l)
-|(a :: b :: c :: d :: l) -> print_string(setString(a) ^ " " ^ setString(b) ^ " " ^ setString(c) ^ " " ^ setString(d) ^ "\n");
-						displayStringList(l)
-|(a :: b :: c :: l) -> print_string(setString(a) ^ " " ^ setString(b) ^ " " ^ setString(c) ^ "\n");
-						displayStringList(l)
-|(a :: b :: l) -> print_string(setString(a) ^ " " ^ setString(b) ^ "\n");
-						displayStringList(l)
-|(a :: l) -> print_string(setString(a) ^ "\n");
-						displayStringList(l)
-|[] -> print_string "\n";;
+(x :: l) -> let rec aux = fun
+			(lst, 0) -> print_string "\n"; displayStringList(lst)
+			| ([], _) -> print_string "\n"; displayStringList([])
+			| ((x :: l), n) -> print_string(setString(x) ^ " "); aux(l, n - 1)
+			in aux(x :: l, 6)
+| [] -> print_string "\n";;
 
 
 let rec space = fun
@@ -230,22 +223,23 @@ let deplacement = fun
    Renvois tous les mots contenus dans la grille de jeu *)
 let rec start = fun
 (16, g, arbre, points, bonus) -> []
-| (i, g, arbre, points, bonus) -> start(i+1, g, arbre, points, bonus) @ let rec search (x::l) g arbre mot =
-											try
-												let branche = getBranche(g.[x], arbre) and gnew = removeLetter(g, x) in
-												let aux = fun
-												(Noeud((c, b), lst), points, bonus) -> (if b then [((mot ^ string_of_char(c)), score(gnew, points, bonus))] else []) @ 
-													let rec reSearch = fun
-													((x :: l), g, arbre, mot) -> (search [x] g arbre mot) @ reSearch(l, g, arbre, mot)
-													| ([], _, _, _) -> []
-													in reSearch((l @ deplacement(x, g)), gnew, lst, (mot ^ string_of_char(c)))
-												in aux(branche, points, bonus)
-											with Not_Found -> if l = [] then [] else search l g arbre mot
-										in (search [i] g arbre "");;
+| (i, g, arbre, points, bonus) -> start(i+1, g, arbre, points, bonus) @
+									let rec search (x::l) g arbre mot =
+										try
+											let branche = getBranche(g.[x], arbre) and gnew = removeLetter(g, x) in
+											let aux = fun
+											(Noeud((c, b), lst), points, bonus) -> (if b then [((mot ^ string_of_char(c)), score(gnew, points, bonus))] else []) @ 
+												let rec reSearch = fun
+												((x :: l), g, arbre, mot) -> (search [x] g arbre mot) @ reSearch(l, g, arbre, mot)
+												| ([], _, _, _) -> []
+												in reSearch((l @ deplacement(x, g)), gnew, lst, (mot ^ string_of_char(c)))
+											in aux(branche, points, bonus)
+										with Not_Found -> if l = [] then [] else search l g arbre mot
+									in search [i] g arbre "";;
 
 
 let rec solve grille arbre = let (g, p, b) = divideInformations(grille, ("", [], [])) in
-											getFinalScore(removeDuplicate(start(0, g, arbre, p, b)));;
+								getFinalScore(removeDuplicate(start(0, g, arbre, p, b)));;
 
 
 
@@ -255,22 +249,23 @@ let rec solve grille arbre = let (g, p, b) = divideInformations(grille, ("", [],
 
 let file = "E:\FAC\Caml\Projet\dico.txt";;
 
-let grille=[("d", 1, 0);
-			("i", 1, 0);
-			("t", 2, DL);
+let grille=[("p", 1, 0);
+			("l", 1, 0);
+			("m", 2, DL);
+			("r", 1, 0);
+			("e", 1, DW);
 			("a", 1, 0);
-			("m", 1, DW);
-			("j", 1, 0);
-			("n", 3, 0);
-			("a", 1, 0);
-			("e", 1, TW);
-			("a", 1, 0);
-			("z", 2, 0);
-			("g", 1, 0);
+			("i", 3, 0);
 			("e", 1, 0);
-			("s", 1, TL);
-			("i", 1, 0);
-			("f", 2, 0)];;
+			("r", 1, TW);
+			("t", 1, 0);
+			("n", 2, 0);
+			("s", 1, 0);
+			("c", 1, 0);
+			("e", 1, TL);
+			("s", 1, 0);
+			("u", 2, 0)];;
+
 
 let fd = open_in(file);;
 let timeRead = Sys__time();;
