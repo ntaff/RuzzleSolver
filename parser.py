@@ -9,6 +9,12 @@ def correct(s):
         return False
     if '\'' in s:
         return False
+    if ')' in s:
+        return False
+    if '.' in s:
+        return False
+    if '!' in s:
+        return False
     if len(s) > 17:
        return False
     return True
@@ -21,9 +27,12 @@ def parseFile():
    lst = sorted(set([elem[:-1] for elem in content if correct(elem)]))
 
    file = open('dico.txt', 'w', encoding = 'utf-8')
-   for line in lst:
-        file.write(line)
-        file.write('\n')
+   for i in range(len(lst)):
+        if i == len(lst) - 1:
+            file.write(lst[i])
+        else:
+            file.write(lst[i])
+            file.write('\n')
    file.close()
 
 parseFile()
