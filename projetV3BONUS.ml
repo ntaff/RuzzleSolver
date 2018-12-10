@@ -1,23 +1,29 @@
 (****************************************************)
-(***************** VARIABLES BONUS ******************)
+(***************PROJET RUZZLE SOLVER*****************)
+(************NICOLAS TAFFOUREAU (@ntaff)*************)
+(************ADRIEN TREILHOU (@AdrienFAC)************)
+(*****************VERSION 3BONUS*********************)
 (****************************************************)
 
-let DL = 1;; (* Lettre conte double *)
-let TL = 2;; (* Lettre conte triple *)
-let DW = 3;; (* Mot conte double *)
-let TW = 4;; (* Mot conte triple *)
+let DL = 1;; (* Lettre compte double *)
+let TL = 2;; (* Lettre compte triple *)
+let DW = 3;; (* Mot compte double *)
+let TW = 4;; (* Mot compte triple *)
 
 
 (****************************************************)
 (********************** CHAINE **********************)
 (****************************************************)
 
+(* tetec : string -> char = <fun> *)
 let tetec = fun 
 "" -> failwith "tetec: chaine vide"
 | s -> nth_char s 0;;
 
+(* tetes : string -> string = <fun> *)
 let tetes = fun s -> string_of_char(tetec(s));;
 
+(* reste : string -> string = <fun> *)
 let reste = fun
 "" -> ""
 | s -> sub_string s (1) ((string_length s) - 1);;
@@ -30,6 +36,7 @@ let reste = fun
 
 (* Lit un fichier ligne par ligne à partir de son file descriptor
 et le renvois sous forme de le liste de string *)
+(* readFileByLines : in_channel -> string list = <fun> *)
 let rec readFileByLines fd =
 	try
 		let l = input_line fd in
@@ -46,6 +53,7 @@ type Arbre = Noeud of (char * bool) * Arbre list;;
 
 
 (* Ajoute un mot dans un arbre *)
+(* addInTree : string * Arbre list -> Arbre list = <fun> *)
 let rec addInTree = fun
 ("", arbre) -> arbre
 | (mot, []) -> [Noeud((mot.[0], (string_length mot) = 1), addInTree(reste(mot), []))]
@@ -55,6 +63,7 @@ let rec addInTree = fun
 
 
 (* Créé un arbre à partir d'une liste de mot *)
+(* createTree : string list * Arbre -> Arbre list = <fun> *)
 let createTree = fun
 (dico, Noeud((c, b), lst)) -> let rec aux = fun
 								(mot :: reste, arbre) -> aux(reste, addInTree(mot, arbre))
@@ -68,12 +77,14 @@ let createTree = fun
 (*  /!\ Fonctions à supprimer avant de rendre /!\   *)
 (****************************************************)
 
+(* setString : string -> string = <fun> *)
 let rec setString = fun s -> let rec aux = fun
 							(s, 0) -> s
 							| (s, n) -> aux(s, n-1) ^ " "
 							in aux(s, 16 - (string_length s));;
 
-	
+(* DEBUGAGE Affiche une liste de string *)
+(* displayStringList : string list -> unit = <fun> *)
 let rec displayStringList = fun
 (x :: l) -> let rec aux = fun
 			(lst, 0) -> print_string "\n"; displayStringList(lst)
@@ -82,13 +93,14 @@ let rec displayStringList = fun
 			in aux(x :: l, 6)
 | [] -> print_string "\n";;
 
-
+(* space : int -> string = <fun> *)
 let rec space = fun
 (-1) -> ""
 | (0) -> " "
 | (n) -> " " ^ space(n-1);;
 
 
+(* displayTree : Arbre list * int -> unit = <fun> *)
 let rec displayTree = fun
 (Noeud((c, b), lst) :: suite, p) -> print_string(space(p) ^ string_of_char(c) ^ "\n");
 									displayTree(lst, p+1);
@@ -166,6 +178,7 @@ let rec insere = fun
 
 
 (* Retire les mots en double en gardant ceux qui rapportent le plus de points *)
+(* removeDuplicate : 'a list -> 'a list = <fun> *)
 let removeDuplicate = fun ((mot, point) :: l) -> let rec aux = fun
 												((mot, point) :: l, lst) -> aux(l, insere((mot, point), lst))
 												| ([], lst) -> lst
@@ -173,6 +186,7 @@ let removeDuplicate = fun ((mot, point) :: l) -> let rec aux = fun
 
 
 (* Remplace la lettre à l'index (i) par un (".") *)
+(* removeLetter : string * int -> string = <fun> *)
 let rec removeLetter = fun
 (s, 0) -> "." ^ reste(s)
 | (s, i) -> tetes(s) ^ removeLetter(reste(s), i - 1);;
@@ -181,6 +195,7 @@ let rec removeLetter = fun
 (* Recherche dans un arbre une lettre.
    Raise Not_Found si la lettre n'est pas dans l'arbre *)
 exception Not_Found;;
+(* getBranche : char * Arbre list -> Arbre = <fun> *)
 let rec getBranche = fun
 (lettre, Noeud((c, b), lst) :: suite) -> if lettre = c
 											then (Noeud((c, b), lst))
@@ -190,6 +205,7 @@ let rec getBranche = fun
 
 (* Gère les déplacements dans la grille
    Renvois la liste des déplacements possibles *)
+(* canDo : int list * string -> int list = <fun> *)
 let rec canDo = fun
 (x :: l, g) -> if g.[x] != `.`
 					then x :: canDo(l, g)
@@ -199,6 +215,7 @@ let rec canDo = fun
 
 (* Gère les déplacements dans la grille
    Renvois la liste des déplacements possibles *)
+(* deplacement : int * string -> int list = <fun> *)
 let deplacement = fun
 (0, g) -> canDo([1;4;5], g)
 | (1, g) -> canDo([0;2;4;5;6], g)
@@ -221,6 +238,7 @@ let deplacement = fun
 
 (* Coeur de l'algorithme
    Renvois tous les mots contenus dans la grille de jeu *)
+(* start : int * string * Arbre list * int list * int list -> (string * int) list = <fun> *)
 let rec start = fun
 (16, g, arbre, points, bonus) -> []
 | (i, g, arbre, points, bonus) -> start(i+1, g, arbre, points, bonus) @
@@ -238,49 +256,72 @@ let rec start = fun
 									in search [i] g arbre "";;
 
 
+(* solve : (string * int * int) list -> Arbre list -> string list * int = <fun> *)
 let rec solve grille arbre = let (g, p, b) = divideInformations(grille, ("", [], [])) in
 								getFinalScore(removeDuplicate(start(0, g, arbre, p, b)));;
 
 
 
 (****************************************************)
-(*********************** TESTS **********************)
+(******************* JEU DE TESTS *******************)
 (****************************************************)
 
-let file = "E:\FAC\Caml\Projet\dico.txt";;
+(* Chemin d'accès absolu vers le dictionnaire *)
+let file = "C:\Users\Taffoureau\Documents\dico.txt";;
 
-let grille=[("p", 1, 0);
-			("l", 1, 0);
-			("m", 2, DL);
-			("r", 1, 0);
-			("e", 1, DW);
+(* La grille de jeu, sous forme de triplet (lettre, points, bonus) *)
+let grille=[("d", 1, 0);
+			("i", 1, 0);
+			("t", 2, DL);
 			("a", 1, 0);
-			("i", 3, 0);
+			("m", 1, DW);
+			("j", 1, 0);
+			("n", 3, 0);
+			("a", 1, 0);
+			("e", 1, TW);
+			("a", 1, 0);
+			("z", 2, 0);
+			("g", 1, 0);
 			("e", 1, 0);
-			("r", 1, TW);
-			("t", 1, 0);
-			("n", 2, 0);
-			("s", 1, 0);
-			("c", 1, 0);
-			("e", 1, TL);
-			("s", 1, 0);
-			("u", 2, 0)];;
+			("s", 1, TL);
+			("i", 1, 0);
+			("f", 2, 0)];;
 
-
+(* On ouvre le fichier dans un fd *)
 let fd = open_in(file);;
+
+(* On prend l'empreinte du temps courante *)
 let timeRead = Sys__time();;
+
+(* On recupère le contenu du dictionnaire *)
 let fileContent = readFileByLines(fd);;
+
+(* Combien de temps la lecture du dictionnaire a-t-elle prise *)
 let timeRead = Sys__time() -. timeRead;;
+
+(* On ferme le fd *)
 close_in fd;;
 
+(* On reprend l'empreinte de temps courante *)
 let timeTree = Sys__time();;
+
+(* On crée l'arbre associé au contenu du dictionnaire *)
 let arbre = createTree(fileContent, Noeud((` `, false), []));;
+
+(* Combien de temps la génération de l'arbre a-t-elle prise ? *)
 let timeTree = Sys__time() -. timeTree;;
 
+(* On reprend l'empreinte de temps courante *)
 let timeResult = Sys__time();;
+
+(* On lance l'algorithme de recherche des résultats à partir de la grille et de l'arbre construit *)
 let (result, points) = solve grille arbre;;
+
+(* Combien de temps la recherche des resultat a-t-elle prise ? *)
 let timeResult = Sys__time() -. timeResult;;
 
+
+(* On affiche statistiques, temps, points et nombre de résultats *)
 print_string("\n\nLecture du fichier: " ^ string_of_float(timeRead));;
 print_string("Creation de l'arbre: " ^ string_of_float(timeTree));;
 print_string("Recherche des résultats: " ^ string_of_float(timeResult));;
