@@ -197,23 +197,46 @@ let rec solve g arbre = removeDuplicate(start(0, g, arbre));;
 
 (*********************** JEU DE TESTS **********************)
 
+(* Chemin d'accès absolu vers le dictionnaire *)
 let file = "C:\Users\Taffoureau\Documents\dico.txt";;
+
+(* On définie la grille de jeu sous forme de chaîne de caractères *)
 let grille = "ditamjnaeazgesif";;
 
+(* On ouvre le fichier dans un fd *)
 let fd = open_in(file);;
+
+(* On prend l'empreinte du temps courante *)
 let timeRead = Sys__time();;
+
+(* On recupère le contenu du dictionnaire *)
 let fileContent = readFileByLines(fd);;
+
+(* Combien de temps la lecture du dictionnaire a-t-elle prise ? *)
 let timeRead = Sys__time() -. timeRead;;
+
+(* On ferme le fd *)
 close_in fd;;
 
+(* On reprend l'empreinte du temps courante *)
 let timeTree = Sys__time();;
+
+(* On crée l'arbre associé au contenu du dictionnaire *)
 let arbre = createTree(fileContent, Noeud((` `, false), []));;
+
+(* Combien de temps l'arbre a-t-il mis à se créer ? *)
 let timeTree = Sys__time() -. timeTree;;
 
+(* On reprend l'empreinte du temps courante *)
 let timeResult = Sys__time();;
+
+(* On lance l'algorithme de recherche des résultats à partir de la grille et de l'arbre construit *)
 let result = solve grille arbre;;
+
+(* Combien de temps la recherche des resultat a-t-elle prise ? *)
 let timeResult = Sys__time() -. timeResult;;
 
+(* On affiche statistiques, temps, liste et nombre de résultats *)
 print_string("\n\nLecture du fichier: " ^ string_of_float(timeRead));;
 print_string("Creation de l'arbre: " ^ string_of_float(timeTree));;
 print_string("Recherche des résultats: " ^ string_of_float(timeResult));;
