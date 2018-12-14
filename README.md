@@ -20,9 +20,9 @@ Contient les fichiers suivants (V4) :
 
 2. `parser.py`: Contient des fonctions permettant de parser un fichier texte afin d'enlever les caractères indésirables (accents, mots composés...)
 
-3. `projetV4.ml`: Contient les fonctions permettant, à partir un tableau de jeu, de renvoyer l'ensemble des mots possibles, à partir d'un dictionnaire de mots
+3. `RuzzleSolverV4.ml`: Contient les fonctions permettant, à partir un tableau de jeu, de renvoyer l'ensemble des mots possibles, à partir d'un dictionnaire de mots
 
-3. `jeuDeTests.ml`: Contient un exemple d'utilisation du solveur avec une grille donnée sous forme d'une chaîne de caractères
+3. `Example.ml`: Contient un exemple d'utilisation du solveur avec une grille donnée sous forme d'une chaîne de caractères
 
 
 About the authors                                                  {#about}
