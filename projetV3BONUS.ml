@@ -74,7 +74,6 @@ let createTree = fun
 
 (****************************************************)
 (********************* DEBUGAGE *********************)
-(*  /!\ Fonctions à supprimer avant de rendre /!\   *)
 (****************************************************)
 
 (* setString : string -> string = <fun> *)
@@ -83,15 +82,17 @@ let rec setString = fun s -> let rec aux = fun
 							| (s, n) -> aux(s, n-1) ^ " "
 							in aux(s, 16 - (string_length s));;
 
-(* DEBUGAGE Affiche une liste de string *)
-(* displayStringList : string list -> unit = <fun> *)
+
+(* DEBUGAGE Affiche la liste des résultats (n représente le nombre de collones) *)
+(* displayStringList : string list * string * int -> unit = <fun> *)
 let rec displayStringList = fun
-(x :: l) -> let rec aux = fun
-			(lst, 0) -> print_string "\n"; displayStringList(lst)
-			| ([], _) -> print_string "\n"; displayStringList([])
-			| ((x :: l), n) -> print_string(setString(x) ^ " "); aux(l, n - 1)
-			in aux(x :: l, 6)
-| [] -> print_string "\n";;
+(x :: l, s, n) -> let rec aux = fun
+			(lst, 0, s, save) -> displayStringList(lst, s ^ "\n", save)
+			| ([], _, s, save) -> displayStringList([], s ^ "\n", save)
+			| ((x :: l), n, s, save) -> aux(l, n - 1, s ^ setString(x) ^ " ", save)
+			in aux(x :: l, n, s, n)
+| ([], s, _) -> print_string s;;
+
 
 (* space : int -> string = <fun> *)
 let rec space = fun
@@ -100,12 +101,13 @@ let rec space = fun
 | (n) -> " " ^ space(n-1);;
 
 
-(* displayTree : Arbre list * int -> unit = <fun> *)
+(* DEBUGAGE Affiche l'arbre
+   /!\ p représente le nombre d'espaces, mettre -1 lors de l'appel 
+   Exemple: print_string (displayTree(arbre, -1)) *)
+(* displayTree : Arbre list * int -> string = <fun> *)
 let rec displayTree = fun
-(Noeud((c, b), lst) :: suite, p) -> print_string(space(p) ^ string_of_char(c) ^ "\n");
-									displayTree(lst, p+1);
-									displayTree(suite, p)
-| ([], p) -> print_string("");;
+(Noeud((c, b), lst) :: suite, p) -> (space(p) ^ string_of_char(c) ^ "\n") ^ displayTree(lst, p+1) ^ displayTree(suite, p)
+| ([], p) -> "";;
 
 
 
@@ -113,13 +115,14 @@ let rec displayTree = fun
 (****************** FONCTIONS BONUS *****************)
 (****************************************************)
 
-(* Divise la grille en une string et 2 lites *)
+(* Divise la grille en une string et 2 listes
+   (string contenant la grille, une liste avec les points et une autre avec les bonus) *)
 let rec divideInformations = fun
 ((a, b, c) :: l, (d, e, f)) -> divideInformations(l, (d ^ a, e @ [b], f @ [c]))
 | ([], triplet) -> triplet;;
 
 
-(* Renvois la taille du mot *)
+(* Renvois la taille du mot trouvé *)
 let rec numberLetter = fun
 "" -> 0
 | s -> if s.[0] = `.`
@@ -182,7 +185,8 @@ let rec insere = fun
 let removeDuplicate = fun ((mot, point) :: l) -> let rec aux = fun
 												((mot, point) :: l, lst) -> aux(l, insere((mot, point), lst))
 												| ([], lst) -> lst
-												in aux((mot, point) :: l, []);;
+												in aux((mot, point) :: l, [])
+							| _ -> [];;
 
 
 (* Remplace la lettre à l'index (i) par un (".") *)
@@ -263,31 +267,31 @@ let rec solve grille arbre = let (g, p, b) = divideInformations(grille, ("", [],
 
 
 (****************************************************)
-(******************* JEU DE TESTS *******************)
+(****************** JEUX DE TESTS *******************)
 (****************************************************)
 
 (* Chemin d'accès absolu vers le dictionnaire *)
-let file = "C:\Users\Taffoureau\Documents\dico.txt";;
+let file = "E:\FAC\Caml\Projet\dico.txt";;
 
 (* La grille de jeu, sous forme de triplet (lettre, points, bonus) *)
-let grille=[("d", 1, 0);
-			("i", 1, 0);
-			("t", 2, DL);
-			("a", 1, 0);
-			("m", 1, DW);
-			("j", 1, 0);
-			("n", 3, 0);
-			("a", 1, 0);
-			("e", 1, TW);
-			("a", 1, 0);
-			("z", 2, 0);
-			("g", 1, 0);
+let grille=[("m", 1, 0);
 			("e", 1, 0);
-			("s", 1, TL);
+			("r", 2, DL);
+			("c", 1, 0);
+			("p", 1, DW);
+			("a", 1, 0);
+			("t", 3, 0);
+			("e", 1, 0);
+			("l", 1, TW);
 			("i", 1, 0);
-			("f", 2, 0)];;
+			("n", 2, 0);
+			("s", 1, 0);
+			("r", 1, 0);
+			("e", 1, TL);
+			("s", 1, 0);
+			("u", 2, 0)];;
 
-(* On ouvre le fichier dans un fd *)
+(* On ouvre le fichier dans un file descriptor *)
 let fd = open_in(file);;
 
 (* On prend l'empreinte du temps courante *)
@@ -328,4 +332,4 @@ print_string("Recherche des résultats: " ^ string_of_float(timeResult));;
 print_string("Nombre de résultats: " ^ string_of_int(list_length result));;
 print_string("Nombre de points: " ^ string_of_int(points));;
 print_string("Liste des résultats:");;
-displayStringList(result);;
+displayStringList(result, "\n", 8);;
